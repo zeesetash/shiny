@@ -8,14 +8,15 @@ prod_codes <- setNames(products$prod_code, products$title)
 
 ui <- fluidPage(
   fluidRow(
-    column(8,
+    column(6,
            selectInput("code", "Product",
                        choices = setNames(products$prod_code, products$title),
                        width = "100%"
            )
     ),
     column(2, selectInput("y", "Y axis", c("rate", "count"))
-           )
+           ),
+    column(4, sliderInput("rows", "Rows", min = 2, max = 20, value = 5))
   ),
   fluidRow(
     column(4, tableOutput("diag")),
@@ -31,9 +32,9 @@ ui <- fluidPage(
   )
 )
 server <- function(input, output, session) {
-  count_top <- function(df, var, n = 5) {
+  count_top <- function(df, var, n) {
     df %>%
-      mutate({{ var }} := fct_lump(fct_infreq({{ var }}), n = n)) %>%
+      mutate({{ var }} := fct_lump(fct_infreq({{ var }}), n = input$rows)) %>%
       group_by({{ var }}) %>%
       summarise(n = as.integer(sum(weight)))
   }
